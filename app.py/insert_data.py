@@ -50,7 +50,7 @@ while True:
     print("Data insertion complete.")
 
     # Esperar por um período antes de inserir novos dados (por exemplo, 10 segundos)
-    time.sleep(10)
+    time.sleep(30)
 
 
 
