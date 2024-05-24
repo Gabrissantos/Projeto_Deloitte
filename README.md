@@ -7,11 +7,17 @@ Este projeto tem como objetivo criar um sistema de monitoramento de equipamentos
 2. Ferramentas e Plataformas Utilizadas
 
 Anaconda: Utilizado para criar e gerenciar o ambiente de desenvolvimento Python.
+
 Flask: Um microframework para criar a API backend.
+
 SQLite: Um banco de dados leve usado para armazenar os dados dos dispositivos.
+
 HTML/CSS/JavaScript: Utilizados para o frontend, criando a interface do usuário.
+
 Chart.js: Biblioteca JavaScript para gráficos, usada para visualizar os dados de status dos dispositivos.
+
 Flask-CORS: Para permitir requisições entre o frontend e o backend.
+
 Flask-Migrate: Para gerenciar as migrações do banco de dados.
 
 3. Configuração Inicial
@@ -25,6 +31,7 @@ No projeto foi utilizado o prompt anaconda
 3.2 Crie um novo ambiente
 
 conda create -n meu_projeto_flask python=3.9
+
 conda activate meu_projeto_flask
 
 3.3  Instalando Dependências
@@ -38,12 +45,19 @@ pip install flask flask_sqlalchemy flask_migrate flask_cors
 Crie uma estrutura de pastas como a seguinte:
 
 Projeto_Deloitte/ 
+
   App.py/ 
+
     app.py
+
     insert_data.py
+
     templates/ 
+
       index.html 
+
     Migrations/ 
+
       env.py
 
 5. Código Backend (app.py)
