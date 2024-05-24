@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devices Dashboard</title>
+  <style>
+    /* Add your CSS styling here */
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      padding: 5px 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    #critical-alert {
+      color: red;
+      font-weight: bold;
+      display: none; /* Hide by default */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Devices Dashboard</h1>
+    <div id="active-devices">
+      <h2>Active Devices</h2>
+      <ul id="active-devices-list"></ul>
+    </div>
+    <div id="error-devices">
+      <h2>Inactive/Warning/Critical Devices</h2>
+      <ul id="error-devices-list"></ul>
+    </div>
+    <h2>Device Status Chart</h2>
+    <canvas id="statusChart"></canvas>
+    <div id="critical-alert">Temos X equipamentos em estado crítico, abra chamado técnico</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    async function fetchActiveDevices() {
+      try {
+        const response = await fetch('/api/devices/active');
+        const devices = await response.json();
+        const list = document.getElementById('active-devices-list');
+        list.innerHTML = '';
+        devices.forEach(imei => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `IMEI: ${imei}`;
+          list.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error fetching active devices:', error);
+      }
+    }
+
+    async function fetchErrorDevices() {
+      try {
+        const response = await fetch('/api/devices/inactive-with-status');
+        const devices = await response.json();
+        const list = document.getElementById('error-devices-list');
+        list.innerHTML = '';
+        devices.forEach(device => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `IMEI: ${device.imei}, Status: ${device.status}`;
+          list.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('Error fetching error devices:', error);
+      }
+    }
+
+    async function fetchDeviceStatus() {
+      try {
+        const response = await fetch('/api/status');
+        const statusData = await response.json();
+
+        // Verifique se os dados foram retornados corretamente
+        console.log('Device status data:', statusData);
+
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['PowerOn', 'PowerOff', 'Inactive', 'Warning', 'Critical'],
+            datasets: [{
+              label: 'Number of Devices',
+              data: [
+                statusData.powerOnCount,
+                statusData.powerOffCount,
+                statusData.inactiveCount,
+                statusData.warningCount,
+                statusData.criticalCount
+              ],
+              backgroundColor: ['#4CAF50', '#F44336', '#FFC107', '#FF9800', '#F44336']
+            }]
+          },
+          options: {
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching device status:', error);
+      }
+    }
+
+    async function fetchCriticalCount() {
+      try {
+        const response = await fetch('/api/critical-count');
+        const data = await response.json();
+        const criticalCount = data.criticalCount;
+        const alertDiv = document.getElementById('critical-alert');
+        
+        if (criticalCount > 0) {
+          alertDiv.textContent = `Temos ${criticalCount} equipamentos em estado crítico, abra chamado técnico`;
+          alertDiv.style.display = 'block';
+        } else {
+          alertDiv.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error fetching critical count:', error);
+      }
+    }
+
+    fetchActiveDevices();
+    fetchErrorDevices();
+    fetchDeviceStatus();
+    fetchCriticalCount();
+    setInterval(() => {
+      fetchActiveDevices();
+      fetchErrorDevices();
+      fetchDeviceStatus();
+      fetchCriticalCount();
+    }, 30000); // Refresh every 30 seconds
+  </script>
+</body>
+</html>
+
